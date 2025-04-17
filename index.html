@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>跑团记录整理工具</title>
+		<style>
+			body {
+				font-family: "Microsoft YaHei", sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: #f5f5f5;
+			}
+			.container {
+				background-color: white;
+				padding: 20px;
+				border-radius: 8px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				margin-bottom: 20px;
+			}
+			h1 {
+				color: #333;
+				text-align: center;
+				margin-bottom: 30px;
+			}
+			.file-section {
+				margin-bottom: 20px;
+				padding: 15px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+			}
+			.file-section h3 {
+				margin-top: 0;
+				color: #666;
+			}
+			.tag-input {
+				display: flex;
+				align-items: center;
+				margin-bottom: 10px;
+				gap: 10px;
+			}
+			.tag-input input[type="text"] {
+				flex: 1;
+				padding: 8px 12px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				font-size: 14px;
+				transition: border-color 0.3s ease;
+			}
+			.tag-input input[type="text"]:focus {
+				border-color: #4a90e2;
+				outline: none;
+				box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+			}
+			.tag-input input[type="file"] {
+				flex: 2;
+			}
+			button {
+				background-color: #4a90e2;
+				color: white;
+				padding: 8px 16px;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 14px;
+				transition: all 0.3s ease;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 100px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			button:hover {
+				background-color: #357abd;
+				transform: translateY(-1px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			}
+			button:active {
+				transform: translateY(0);
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			button:disabled {
+				background-color: #b3b3b3;
+				cursor: not-allowed;
+				transform: none;
+				box-shadow: none;
+			}
+			button.primary {
+				background-color: #4caf50;
+			}
+			button.primary:hover {
+				background-color: #45a049;
+			}
+			button.secondary {
+				background-color: #4a90e2;
+			}
+			button.secondary:hover {
+				background-color: #357abd;
+			}
+			button.piliang {
+				background-color: #ffffff;
+				border: 1px solid #4a90e2;
+				color: #4a90e2;
+			}
+			button.piliang:hover {
+				background-color: #dcdcdc;
+			}
+			button.danger {
+				background-color: #dc3545;
+			}
+			button.danger:hover {
+				background-color: #c82333;
+			}
+			.file-list {
+				margin-top: 10px;
+			}
+			.file-item {
+				display: flex;
+				align-items: center;
+				margin-bottom: 5px;
+			}
+			.file-item span {
+				margin-right: 10px;
+			}
+			#result {
+				margin-top: 20px;
+				padding: 10px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				background-color: #fff;
+				white-space: pre-wrap;
+			}
+			.progress {
+				margin-top: 20px;
+				height: 8px;
+				background-color: #f0f0f0;
+				border-radius: 4px;
+				overflow: hidden;
+				box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+			}
+			.progress-bar {
+				height: 100%;
+				background-color: #4caf50;
+				width: 0;
+				transition: width 0.3s ease;
+				background-image: linear-gradient(
+					45deg,
+					rgba(255, 255, 255, 0.15) 25%,
+					transparent 25%,
+					transparent 50%,
+					rgba(255, 255, 255, 0.15) 50%,
+					rgba(255, 255, 255, 0.15) 75%,
+					transparent 75%,
+					transparent
+				);
+				background-size: 1rem 1rem;
+				animation: progress-bar-stripes 1s linear infinite;
+			}
+			@keyframes progress-bar-stripes {
+				from {
+					background-position: 1rem 0;
+				}
+				to {
+					background-position: 0 0;
+				}
+			}
+			.section-title {
+				margin-top: 20px;
+				margin-bottom: 10px;
+				font-weight: bold;
+			}
+			.button-group {
+				margin-bottom: 10px;
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+			#processButton {
+				background-color: #4caf50;
+				font-size: 16px;
+				padding: 12px 24px;
+				width: 100%;
+				margin-top: 20px;
+				font-weight: 500;
+			}
+			#processButton:hover {
+				background-color: #45a049;
+			}
+			.help-text {
+				color: #666;
+				font-size: 14px;
+				margin: 5px 0;
+				padding-left: 15px;
+			}
+			.help-section {
+				background-color: #f9f9f9;
+				padding: 15px;
+				border-radius: 4px;
+				margin-bottom: 20px;
+				border-left: 4px solid #4caf50;
+			}
+			.help-section h2 {
+				color: #333;
+				margin-top: 0;
+				margin-bottom: 10px;
+				font-size: 18px;
+			}
+			.help-section ul {
+				margin: 0;
+				padding-left: 20px;
+			}
+			.help-section li {
+				margin-bottom: 8px;
+				line-height: 1.4;
+			}
+			.settings-section {
+				background-color: #f8f9fa;
+				padding: 15px;
+				border-radius: 4px;
+				margin-bottom: 20px;
+				border-left: 4px solid #4a90e2;
+			}
+			.settings-section h3 {
+				margin-top: 0;
+				color: #333;
+				font-size: 16px;
+			}
+			.setting-item {
+				display: flex;
+				align-items: center;
+				margin: 10px 0;
+			}
+			.setting-item label {
+				margin-right: 10px;
+				color: #666;
+			}
+			.setting-item input[type="number"] {
+				width: 80px;
+				padding: 8px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				font-size: 14px;
+				transition: all 0.3s ease;
+			}
+			.setting-item input[type="number"]:focus {
+				border-color: #4a90e2;
+				outline: none;
+				box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+			}
+			.setting-item .unit {
+				margin-left: 5px;
+				color: #666;
+			}
+			.setting-help {
+				font-size: 13px;
+				color: #666;
+				margin-top: 5px;
+				padding-left: 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>跑团记录整理工具</h1>
+
+			<div class="help-section">
+				<h2>使用说明</h2>
+				<ul>
+					<li>
+						<strong>大窗消息文件：</strong>主要聊天记录文件，必须至少上传一个。
+					</li>
+					<li>
+						<strong>小窗消息文件：</strong
+						>私聊或单独的聊天记录，可以上传多个。每个小窗需要设置一个标签名（如：ho1小窗）。
+					</li>
+					<li>
+						<strong>批量上传：</strong
+						>可以一次选择多个文件，系统会自动为每个文件创建输入框。
+					</li>
+					<li>
+						<strong>文件格式：</strong
+						>支持.txt格式的聊天记录文件，消息格式需要符合：名字(QQ号) 时间
+						消息内容
+					</li>
+				</ul>
+				<div
+					class="important-notice"
+					style="
+						margin-top: 15px;
+						padding: 10px;
+						background-color: #fff3e0;
+						border-radius: 4px;
+						border-left: 4px solid #ff9800;
+					"
+				>
+					⚠️
+					<strong>重要提示：</strong
+					>本工具仅为方便整理跑团记录，实际消息顺序可能仍需要一些人为调整，请在使用后检查并按需调整顺序。
+				</div>
+			</div>
+
+			<div class="settings-section">
+				<h3>处理设置</h3>
+				<div class="setting-item">
+					<label for="timeWindow">消息分组时间间隔：</label>
+					<input
+						type="number"
+						id="timeWindow"
+						min="1"
+						value="5"
+						onchange="if(this.value < 1) this.value = 1;"
+					/>
+					<span class="unit">分钟</span>
+				</div>
+				<div class="setting-help">
+					设置小窗消息的分组时间间隔，超过这个时间间隔的消息将被分为不同组。默认为5分钟。
+				</div>
+			</div>
+
+			<div class="file-section">
+				<h3>大窗消息文件</h3>
+				<div class="help-text">上传主要的聊天记录文件，至少需要一个文件。</div>
+				<div class="button-group">
+					<button class="secondary" onclick="addMainFileInput()">
+						添加大窗文件
+					</button>
+					<button class="piliang" onclick="batchAddMainFiles()">
+						批量添加大窗文件
+					</button>
+				</div>
+				<div id="mainFiles">
+					<div class="tag-input">
+						<input type="file" accept=".txt" />
+						<button class="danger" onclick="removeMainFileInput(this)">
+							删除
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="file-section">
+				<h3>小窗消息文件</h3>
+				<div class="help-text">
+					上传需要插入的私聊记录，每个文件都需要设置一个标签名。
+				</div>
+				<div class="button-group">
+					<button class="secondary" onclick="addFileInput()">
+						添加小窗文件
+					</button>
+					<button class="piliang" onclick="batchAddSubFiles()">
+						批量添加小窗文件
+					</button>
+				</div>
+				<div id="subFiles">
+					<div class="tag-input">
+						<input
+							type="file"
+							accept=".txt"
+							onchange="updateTagFromFilename(this)"
+						/>
+						<input
+							type="text"
+							placeholder="输入小窗标签（如：ho1小窗）"
+							style="margin: 0 10px"
+						/>
+						<button class="danger" onclick="removeFileInput(this)">删除</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="help-text" style="margin-bottom: 10px">
+				点击开始处理后，系统会自动整理并合并所有消息记录。
+			</div>
+			<button id="processButton" onclick="processFiles()">开始处理</button>
+
+			<div class="progress">
+				<div class="progress-bar" id="progressBar"></div>
+			</div>
+
+			<div
+				class="help-text"
+				style="
+					margin: 20px 0;
+					padding: 10px;
+					background-color: #e8f4ff;
+					border-radius: 4px;
+					border-left: 4px solid #4a90e2;
+				"
+			>
+				💡 提示：处理完成后的txt文件可以复制到
+				<a
+					href="https://log.weizaima.com/"
+					target="_blank"
+					style="color: #4a90e2; text-decoration: none; font-weight: 500"
+					>海豹着色器</a
+				>
+				中进行着色，获得更好的阅读体验！
+			</div>
+
+			<div id="result"></div>
+		</div>
+
+		<script src="process.js"></script>
+	</body>
+</html>
